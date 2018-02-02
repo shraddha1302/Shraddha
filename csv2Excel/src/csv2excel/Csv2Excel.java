@@ -180,6 +180,7 @@ public class Csv2Excel {
             String line = "";
             while ((line = reader.readLine()) != null) {
 
+                try{
                 if (line.contains("\"\",\"ACNO\",\"AssemblyConstituency\",")) {
 
                     System.out.println(line);
@@ -401,6 +402,10 @@ public class Csv2Excel {
                         cell.setCellValue(toBeProcessedList.get(voter.getIDCardNo().trim()));
                     }
                 }
+            }catch(Exception e)
+                    {
+                    continue;
+                    }
             }
 
             try (FileOutputStream outputStream = new FileOutputStream(xlsxFileName)) {
