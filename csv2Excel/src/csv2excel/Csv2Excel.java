@@ -21,10 +21,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -44,7 +48,7 @@ public class Csv2Excel {
     public static void main(String[] args) throws IOException, Exception {
 
         List<String> processedList = new ArrayList();
-        Map<String, String> toBeProcessedList = new HashMap<String, String>();
+        Map<String, Integer> toBeProcessedList = new HashMap<String, Integer>();
 
         Workbook workbook = null;
         Sheet sheet = null;
@@ -133,7 +137,7 @@ public class Csv2Excel {
                         processedList.add(cell1.getStringCellValue());
                         System.out.println(cell1.getStringCellValue());
                     }
-                    rowCount = sheet.getPhysicalNumberOfRows()-1;
+                    rowCount = sheet.getPhysicalNumberOfRows() - 1;
                     System.out.println("File Reading Completed " + xlsxFileName);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -153,7 +157,7 @@ public class Csv2Excel {
                     if (!str.isEmpty()) {
                         String[] ar = str.split(",");
                         if (ar.length > 1) {
-                            toBeProcessedList.put(ar[1], ar[0]);
+                            toBeProcessedList.put(ar[1], Integer.parseInt(ar[0].trim()));
                         }
                     }
                 }
@@ -255,8 +259,15 @@ public class Csv2Excel {
                     parameter = parameter.substring(22);
                     parameter = parameter.replace("\"", "");
                     parameter1 = parameter.split("/");
+                    if(parameter1.length>1)
+                    {
                     voter.setKLastName(parameter1[0].trim());
                     voter.setELastName(parameter1[1].trim());
+                    }
+                    else{
+                    voter.setKLastName("");
+                    voter.setELastName("");
+                    }
                     System.out.println("KLastName: " + voter.getKLastName());
                     System.out.println("ELastName: " + voter.getELastName());
 
@@ -265,8 +276,15 @@ public class Csv2Excel {
                     parameter = parameter.substring(38);
                     parameter = parameter.replace("\"", "");
                     parameter1 = parameter.split("/");
+                    if(parameter1.length>1)
+                    {
                     voter.setKRelationFirstName(parameter1[0].trim());
                     voter.setERelationFirstName(parameter1[1].trim());
+                    }else
+                    {
+                        voter.setKRelationFirstName("");
+                    voter.setERelationFirstName("");
+                    }
                     System.out.println("KRelationFirstName: " + voter.getKRelationFirstName());
                     System.out.println("ERelationFirstName: " + voter.getERelationFirstName());
                     /*
@@ -394,18 +412,33 @@ public class Csv2Excel {
                 toBeProcessedList.remove(s);
             }
 
+            Set<Entry<String, Integer>> set = toBeProcessedList.entrySet();
+            List<Entry<String, Integer>> list = new ArrayList<Entry<String, Integer>>(set);
+            Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+                @Override
+                public int compare(Map.Entry<String, Integer> o1,
+                        Map.Entry<String, Integer> o2) {
+                    return o1.getValue().compareTo(o2.getValue());
+                }
+            });
+
             BufferedWriter csvWriter = null;
             try {
                 csvWriter = new BufferedWriter(new FileWriter(iMacroInCsvFileName));
-                Iterator iterator = toBeProcessedList.keySet().iterator();
-                while (iterator.hasNext()) {
-                    String key = iterator.next().toString();
-                    String value = toBeProcessedList.get(key);
-                    csvWriter.write(value + "," + key+"\n");
+                /* Iterator iterator = toBeProcessedList.keySet().iterator();
+                 while (iterator.hasNext()) {
+                 String key = iterator.next().toString();
+                 String value = toBeProcessedList.get(key).toString();
+                 csvWriter.write(value + "," + key+"\n");
+                 }*/
+                
+
+                for (Entry<String, Integer> entry : list) {
+                    csvWriter.write(entry.getValue() + "," + entry.getKey() + "\n");
                 }
                 csvWriter.close();
             } catch (IOException ex) {
-
+                ex.printStackTrace();
             }
 
         }
