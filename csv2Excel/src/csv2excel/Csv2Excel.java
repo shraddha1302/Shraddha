@@ -373,7 +373,8 @@ public class Csv2Excel {
                     Matcher matcher = pattern.matcher(voter.getIDCardNo());
 
                     if (!processedList.contains(voter.getIDCardNo()) && matcher.matches()) {
-                        processedList.add(voter.getIDCardNo());
+                        
+                        
                         rowCount++;
                         row1 = sheet.createRow(rowCount);
                         columnCount = 0;
@@ -423,8 +424,10 @@ public class Csv2Excel {
                         //int PDFSlNo = toBeProcessedList.get(voter.getIDCardNo().trim());
                         if(toBeProcessedList.get(voter.getIDCardNo().trim())!= null){
                             cell.setCellValue(toBeProcessedList.get(voter.getIDCardNo().trim()));
+                            processedList.add(voter.getIDCardNo());
                         } else{
                             cell.setCellValue(toBeProcessedList.get(voter.getOldIDCardNo().trim()));
+                            processedList.add(voter.getOldIDCardNo());
                         }
                         
                     }
