@@ -144,13 +144,14 @@ class RadioButtonExample extends JFrame implements ActionListener {
                         writer.write("SET !LOOP 1\n");
 
                         writer.write("SET !DATASOURCE_LINE {{!LOOP}}\n");
-                        writer.write("SET !TIMEOUT_PAGE 5\n");
+                        writer.write("SET !TIMEOUT_PAGE 7\n");
                         writer.write("URL GOTO=http://ceokarnataka.kar.nic.in/SearchWithEpicNo_New.aspx#\n\n");
                         writer.write("TAG POS=1 TYPE=SELECT FORM=ID:aspnetForm ATTR=ID:ctl00_ContentPlaceHolder1_ddlDistrict CONTENT=%"+(district.getSelectedIndex()+1)+"\n");
                         writer.write("TAG POS=1 TYPE=INPUT:TEXT FORM=ID:aspnetForm ATTR=ID:ctl00_ContentPlaceHolder1_txtEpic CONTENT={{!COL2}}\n");
-                        writer.write("TAG POS=1 TYPE=INPUT:SUBMIT FORM=ID:aspnetForm ATTR=ID:ctl00_ContentPlaceHolder1_btnSearch\n\n");
                         writer.write("SET !TIMEOUT_PAGE 2\n");
-                        //writer.write("PROMPT \"Please enter your Captcha:\" !VAR1 \n");
+                        writer.write("TAG POS=1 TYPE=INPUT:SUBMIT FORM=ID:aspnetForm ATTR=ID:ctl00_ContentPlaceHolder1_btnSearch\n\n");
+                    
+
                         writer.write("TAG POS=1 TYPE=INPUT:TEXT FORM=ID:aspnetForm ATTR=ID:ctl00_ContentPlaceHolder1_txtimgcode CONTENT=abcde\n");
                         writer.write("TAG POS=1 TYPE=INPUT:SUBMIT FORM=ID:aspnetForm ATTR=ID:ctl00_ContentPlaceHolder1_Button1\n");
                         writer.write("TAG POS=1 TYPE=INPUT:SUBMIT FORM=ID:aspnetForm ATTR=ID:ctl00_ContentPlaceHolder1_GridView1_ctl02_btnDetails\n\n");
@@ -209,13 +210,23 @@ class RadioButtonExample extends JFrame implements ActionListener {
                                         if ((line1[i++] = reader.readLine()) == null) {
                                             break;
                                         }
+
                                     }
 
+                                    if(line1[2].contains("Photo"))
+                                    {
+                                        line1[2] = line1[5];
+                                        line1[3] = reader.readLine();
+                                        line1[4] = reader.readLine();
+                                        line1[5] = reader.readLine();
+                                        
+                                    }
+                                    
                                     line1[0] = line1[0].replace("House No.:", "");
                                     voter.setHouseNo(line1[0]);
                                     voter.setRName(line1[1]);
                                     voter.setEName(line1[2]);
-                                    voter.setIDCardNo(line1[3]);
+                                    voter.setIDCardNo(line1[3].trim());
 
                                     if (line1[4].startsWith("Sex: FemaleAge: ")) {
 
@@ -271,6 +282,7 @@ class RadioButtonExample extends JFrame implements ActionListener {
                         try {
                             while ((line = reader.readLine()) != null) {
                                 System.out.println(line);
+                                line = line.replace("# ", "");
                                 if (line.isEmpty()) {
                                     continue;
                                 }
