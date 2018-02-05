@@ -69,7 +69,9 @@ public class Csv2Excel {
             System.out.println("getSelectedFile() : " + chooser.getSelectedFile());
             File folder = chooser.getSelectedFile();
             System.out.println("Folder Selected = : " + folder.getAbsolutePath());
-//new1
+            //new1
+            if(chooser.getSelectedFile().getName().contains("_OutputFromMacro.csv")){
+
             String xlsxFileName = chooser.getSelectedFile().getName();
             xlsxFileName = xlsxFileName.replace(".csv", "_Final.xlsx");
             File f = new File(xlsxFileName);
@@ -153,15 +155,21 @@ public class Csv2Excel {
                 //str = in.readLine();
                 while ((str = in.readLine()) != null) {
                     System.out.println(str);
-
+                    try {
                     if (!str.isEmpty()) {
                         String[] ar = str.split(",");
                         if (ar.length > 1) {
                             toBeProcessedList.put(ar[1], Integer.parseInt(ar[0].trim()));
                         }
                     }
+                } catch(Exception e)
+                        {
+                            e.printStackTrace();
+                            continue;
+                        }
                 }
                 toBeProcessedList.forEach((key, value) -> System.out.println(key + " : " + value));
+                 System.out.println("HashMap Completed");
                 in.close();
 
             } catch (IOException e) {
@@ -184,9 +192,24 @@ public class Csv2Excel {
                 if (line.contains("\"\",\"ACNO\",\"AssemblyConstituency\",")) {
 
                     System.out.println(line);
-                    String[] line1 = new String[16];
 
-                    int loop = 0;
+                    String line2 = reader.readLine();
+                    System.out.println("ACNO: " + line2);
+                    voter.setACNO(line2.substring(4, 6).trim());
+                    System.out.println("ACNO: " + voter.getACNO());
+                    
+                    while(!line2.contains("Voter Details"))
+                    {
+                       if((line2 = reader.readLine()) == null)
+                       {
+                           break;
+                       }
+                        System.out.println(line2);
+                    }
+                    String[] line1 = new String[16];
+                    int loop = 2;
+                    if(line2!=null && line2.contains("Voter Details"))
+                    {
                     while (loop < 16) {
                         if ((line1[loop] = reader.readLine()) == null) {
                             break;
@@ -200,9 +223,7 @@ public class Csv2Excel {
                     String parameter;
                     String[] parameter1 = new String[5];
 
-                    System.out.println("ACNO: " + line1[0]);
-                    voter.setACNO(line1[0].substring(4, 6).trim());
-                    System.out.println("ACNO: " + voter.getACNO());
+
 
                     System.out.println("AssemblyConstituency: " + line1[2]);
                     parameter = line1[2];
@@ -399,7 +420,16 @@ public class Csv2Excel {
                         cell = row1.createCell(columnCount++);
                         cell.setCellValue(voter.getOldIDCardNo());
                         cell = row1.createCell(columnCount++);
-                        cell.setCellValue(toBeProcessedList.get(voter.getIDCardNo().trim()));
+                        //int PDFSlNo = toBeProcessedList.get(voter.getIDCardNo().trim());
+                        if(toBeProcessedList.get(voter.getIDCardNo().trim())!= null){
+                            cell.setCellValue(toBeProcessedList.get(voter.getIDCardNo().trim()));
+                        } else{
+                            cell.setCellValue(toBeProcessedList.get(voter.getOldIDCardNo().trim()));
+                        }
+                        
+                    }
+                    }else{
+                        continue;
                     }
                 }
             }catch(Exception e)
@@ -444,6 +474,9 @@ public class Csv2Excel {
                 csvWriter.close();
             } catch (IOException ex) {
                 ex.printStackTrace();
+            }
+        }else{
+                System.out.println("Selected incorrect file :  "+chooser.getSelectedFile().getName());
             }
 
         }
